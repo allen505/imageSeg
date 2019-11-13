@@ -8,10 +8,10 @@ path_in = 'IMG20180826101431.jpg'
 path_out = 'IMG20180826101906.jpg'
 input_dir='input_dir/'
 output_dir='output_dir/'
-arr_in = os.listdir(input_dir)
-arr_out = os.listdir(output_dir)
-print(arr_in)
-print(arr_out)
+# arr_in = os.listdir(input_dir)
+# arr_out = os.listdir(output_dir)
+# print(arr_in)
+# print(arr_out)
 
 
 def next_btn():
@@ -29,15 +29,9 @@ btn1 = Button(root,text=">",command = next_btn)
 in_label = Label(root,text = path_in)
 out_label = Label(root,text  =path_out)
 
-
-
-
-
-		
-
 root.title("GUI")
 root.geometry("900x500")
-root.configure(background='grey')
+# root.cdconfigure(background='grey')
 # canvas_inp.pack(side="left")
 # canvas_out.pack(side = "right")
 size = 350,350
