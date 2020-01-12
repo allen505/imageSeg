@@ -1,37 +1,79 @@
-from datetime import datetime as dt
+from appJar import gui
+from os import listdir,environ
+from os.path import isfile, join
 
-from tkinter import *
-import tkinter
-from tkinter.filedialog import askopenfilename
-from tkinter import ttk, messagebox
+START_WINDOW_SIZE="450x150"
+TWO_VIEW_WINDOW_SIZE=(800,800)
+IMAGE_FRAME_SIZE=(200,200)
 
-WINDOW_SIZE="850x600"
+selectedImage=""
+windowCounter=0
 
-class MainClass:
-    def __init__(self):
-        self.buttonHeight=20
-        self.buttonWidth=50
-        self.root = tkinter.Tk()
-        self.root.title("Image Segmenter")
-        self.root.geometry(WINDOW_SIZE)
-        self.root.resizable(10,10)
-        self.mainFrame=Frame(self.root,bg="#F5F5F5")
-        self.mainFrame.pack_propagate(0)
-        self.mainFrame.pack(fill="both",expand=1)
-        self.mainW()
-        self.root.mainloop()
+# ─── TO BE CALLED WITH PATH TO THE OUTPUT IMAGE ─────────────────────────────────
 
-    def pictureSelect(self):
-        file_path = str(askopenfilename(initialdir="images/", title="Select the image",
-                                            filetypes=[("Image Files", "*.jpeg;*.jpg;*.png")]))
-        final_image(str(file_path))
-        #messagebox.showerror("Error","Image was not selected")
-
-    def mainW(self):
-        #this is the first window which displays as soon as the program runs
-        self.pictureB = ttk.Button(self.mainFrame, text="Select Picture", command=self.pictureSelect)
-        self.pictureB.pack(padx=3,pady=3)
+def outputImage(path):
+    
+    app.setImage("Input", path)
 
 
-if __name__ == '__main__':
-    MainClass()
+# ─── A SAMPLE/DUMMY FUNCTION WHICH IS CALLED WHEN THE PROCESS IMAGE BUTTON IS CALLED 
+
+def dummy(event):
+    # ─── selectedImage IS A GLOBAL VARIABLE THAT CAN BE USED TO ACCESS THE NAME OF THE SELECTEDIMAGE 
+    print("Dummy called")
+    print(selectedImage)
+
+
+# ────────────────────────────────────────────────────────────────────────────────
+
+
+def selectImage(event):
+    global selectedImage
+    selectedImage=(app.getListBox("ListOfImages"))[0]
+    app.setImage("Input", selectedImage)
+
+def TwoViewWindow(path):
+    windowTitle="Folder View "+str(windowCounter)
+    app.startSubWindow(windowTitle, modal=True)    
+    app.setSize(TWO_VIEW_WINDOW_SIZE)
+    app.setBg("#FFFFFF")
+    app.setImageLocation(path)    
+    imagesInPath = [f for f in listdir(path) if isfile(join(path, f))]
+    
+    app.startFrame("LEFT", row=0, column=0)
+    app.setSize(IMAGE_FRAME_SIZE)
+    app.addImage("Input", None ,compound="bottom")
+    app.stopFrame()
+    
+    app.startFrame("CENTER", row=0, column=1)
+    app.addListBox("ListOfImages", imagesInPath)
+    app.addButton("Select", selectImage)
+    app.addButton("Process Image", dummy)
+    app.stopFrame()
+    
+    app.startFrame("RIGHT", row=0, column=2)
+    app.setSize(IMAGE_FRAME_SIZE)
+    app.addImage("Output", None,compound="bottom")
+    app.stopFrame()    
+    
+    app.stopSubWindow()
+    app.showSubWindow(windowTitle, hide=False)
+
+
+def StartPress(button):
+    if button == "Close":
+        app.stop()
+    else:
+        # print("Opening")
+        choosenFolder=app.directoryBox(title="Open Folder", dirName="images/Sample_Images/input")
+        TwoViewWindow(choosenFolder)
+        
+
+if environ.get('DISPLAY','') == '':
+    # print('no display found. Using :0.0')
+    environ.__setitem__('DISPLAY', ':0.0')
+    
+
+app=gui("Image Segmentation",START_WINDOW_SIZE)
+app.addButtons(["Open Folder", "Close"], StartPress)
+app.go()
